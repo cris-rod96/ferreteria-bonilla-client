@@ -104,7 +104,7 @@ const Login = () => {
 
             <div className="flex justify-end opacity-80 text-[15px]">
               <a href="#" className="hover:opacity-60 transition">
-                ¿Olvidaste tu contraseña?
+                ¿Ya tienes una cuenta?
               </a>
             </div>
 
