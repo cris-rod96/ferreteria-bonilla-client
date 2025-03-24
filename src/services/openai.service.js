@@ -9,7 +9,7 @@ const openai = new OpenAI({
 export const getChatResponse = async (msg) => {
   try {
     const response = await openai.chat.completions.create({
-      model: "o1",
+      model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: msg }],
     });
     return response.choices[0].message.content;

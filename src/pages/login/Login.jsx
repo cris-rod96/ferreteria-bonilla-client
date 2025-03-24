@@ -1,49 +1,78 @@
-import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { MdEmail, MdLock } from "react-icons/md";
-import { NavLink } from "react-router-dom";
-import { toast, Toaster } from "sonner";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
-import { clientId } from "../../config/index.config";
+import { useState } from 'react'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { MdEmail, MdLock } from 'react-icons/md'
+import { NavLink } from 'react-router-dom'
+import { toast, Toaster } from 'sonner'
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from 'jwt-decode'
+import { clientId } from '../../config/index.config'
+import { authApi } from '../../api/index.api'
+import { AxiosError } from 'axios'
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
-    email: "",
-    password: "",
-  });
-  const [showPassword, setShowPassword] = useState(false);
+    email: '',
+    password: '',
+  })
+  const [showPassword, setShowPassword] = useState(false)
 
-  const toggleShowPassword = () => setShowPassword((prev) => !prev);
+  const toggleShowPassword = () => setShowPassword((prev) => !prev)
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
 
     setCredentials((credential) => ({
       ...credential,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     const credentialsExists = Object.values(credentials).every(
-      (data) => data !== ""
-    );
+      (data) => data !== ''
+    )
     if (!credentialsExists) {
-      toast.error("Todos los datos son obligatorios");
+      toast.error('Todos los datos son obligatorios')
+      return
     }
-  };
+
+    authApi
+      .loginWithCredentials(credentials)
+      .then((res) => {
+        const { user } = res.data
+        toast.success(`Bienvenido ${user.full_name}`)
+      })
+      .catch((err) => {
+        if (err instanceof AxiosError) {
+          toast.error(err.response.data.message)
+        } else {
+          toast.error('Error desconocido. Intente más tarde.')
+        }
+      })
+  }
 
   const handleGoogleSuccess = (response) => {
-    const decoded = jwtDecode(response.credential);
-    const { email, sub, name } = decoded;
-    toast.success(`Bienvenido, ${decoded.name}`);
-  };
+    const decoded = jwtDecode(response.credential)
+    const { sub } = decoded
+    authApi
+      .loginWithGoogle(sub)
+      .then((res) => {
+        const { user } = res.data
+        toast.success(`Bienvenido ${user.full_name}`)
+      })
+      .catch((err) => {
+        if (err instanceof AxiosError) {
+          toast.error(err.response.data.message)
+        } else {
+          toast.error('Error desconocido. Intente más tarde.')
+        }
+      })
+  }
 
   const handleGoogleFailure = () => {
-    toast.error("Error al autenticar con Google");
-  };
+    toast.error('Error al autenticar con Google')
+  }
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <main className="w-full h-screen overflow-hidden flex flex-row">
@@ -83,7 +112,7 @@ const Login = () => {
                   <MdLock size={30} color="white" />
                 </div>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   name="password"
                   onChange={handleChange}
                   className="flex-1 h-full outline-none px-2"
@@ -104,7 +133,7 @@ const Login = () => {
 
             <div className="flex justify-end opacity-80 text-[15px]">
               <a href="#" className="hover:opacity-60 transition">
-                ¿Ya tienes una cuenta?
+                ¿Olvidaste tu contraseña?
               </a>
             </div>
 
@@ -117,7 +146,7 @@ const Login = () => {
 
             <div className="flex items-center justify-center mt-5">
               <p>
-                ¿Aún no tienes una cuenta?. Registrate{" "}
+                ¿Aún no tienes una cuenta?. Registrate{' '}
                 <NavLink
                   to="/registro"
                   className="text-[#fd6c01] font-bold hover:text-[#cb4d03] transition"
@@ -139,7 +168,7 @@ const Login = () => {
         <Toaster richColors position="bottom-right" />
       </main>
     </GoogleOAuthProvider>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

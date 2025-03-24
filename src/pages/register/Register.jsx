@@ -1,14 +1,17 @@
-import { useState } from "react";
-import { FaEye, FaEyeSlash, FaIdCard, FaUser } from "react-icons/fa";
-import { MdEmail, MdLock, MdPhone } from "react-icons/md";
-import { NavLink } from "react-router-dom";
-import { toast, Toaster } from "sonner";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
-import { clientId } from "../../config/index.config";
-import { userApi } from "../../api/index.api";
+import { useState } from 'react'
+import { FaEye, FaEyeSlash, FaIdCard, FaUser } from 'react-icons/fa'
+import { MdEmail, MdLock, MdPhone } from 'react-icons/md'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { toast, Toaster } from 'sonner'
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from 'jwt-decode'
+import { clientId } from '../../config/index.config'
+import { userApi } from '../../api/index.api'
+import { AxiosError } from 'axios'
+import { storageUtil } from '../../utils/index.utils'
 
 const Register = () => {
+  const navigate = useNavigate()
   const [user, setUser] = useState({
     full_name: null,
     email: null,
@@ -16,48 +19,72 @@ const Register = () => {
     phone: null,
     dni: null,
     profile_picture: null,
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const toggleShowPassword = () => setShowPassword((prev) => !prev);
+  const toggleShowPassword = () => setShowPassword((prev) => !prev)
   const toggleShowConfirmPassword = () =>
-    setShowConfirmPassword((prev) => !prev);
+    setShowConfirmPassword((prev) => !prev)
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
 
     setUser((data) => ({
       ...data,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const credentialsExists = Object.values(user).every((data) => data !== "");
+    e.preventDefault()
+    const credentialsExists = Object.values(user).every((data) => data !== '')
     if (!credentialsExists) {
-      toast.error("Todos los datos son obligatorios");
+      toast.error('Todos los datos son obligatorios')
     }
-  };
+  }
 
   const handleGoogleSuccess = (response) => {
-    const decoded = jwtDecode(response.credential);
-    console.log(decoded);
-    const { email, sub, name, picture } = decoded;
-    setUser({
-      full_name: name,
-      email: email,
-      profile_picture: picture,
-      sub: sub,
-    });
+    const decoded = jwtDecode(response.credential)
+    const { email, sub, name, picture } = decoded
+    const dataUser = {
+      email,
+      fullName: name,
+      profilePicture: picture,
+      sub,
+    }
+    setUser((prev) => ({
+      ...prev,
+      fullName: name,
+      profilePicture: picture,
+      sub,
+      email,
+    }))
 
-    toast.success(`Bienvenido, ${decoded.name}`);
-  };
+    userApi
+      .registerWithGoogle(dataUser)
+      .then((res) => {
+        toast.success(`${res.data.message}. Bienvenido.`)
+        storageUtil.saveData('user-session', {
+          'user-info': res.data.user,
+          token: res.data.token,
+        })
+        setTimeout(() => {
+          navigate('/')
+        }, 2500)
+      })
+      .catch((err) => {
+        if (err instanceof AxiosError) {
+          toast.error(err.response.data.message)
+        } else {
+          toast.error('Error desconocido. Intente más tarde.')
+        }
+      })
+  }
 
   const handleGoogleFailure = () => {
-    toast.error("Error al autenticar con Google");
-  };
+    toast.error('Error al autenticar con Google')
+  }
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <main className="w-full h-full flex flex-row py-10">
@@ -82,7 +109,7 @@ const Register = () => {
                   </div>
                   <input
                     type="text"
-                    name="full_name"
+                    name="fullName"
                     autoComplete="off"
                     onChange={handleChange}
                     className="flex-1 h-full outline-none px-2"
@@ -154,7 +181,7 @@ const Register = () => {
                     <MdLock size={30} color="white" />
                   </div>
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     name="password"
                     onChange={handleChange}
                     className="flex-1 h-full outline-none px-2"
@@ -181,7 +208,7 @@ const Register = () => {
                     <MdLock size={30} color="white" />
                   </div>
                   <input
-                    type={showConfirmPassword ? "text" : "password"}
+                    type={showConfirmPassword ? 'text' : 'password'}
                     name="confirm-password"
                     onChange={handleChange}
                     className="flex-1 h-full outline-none px-2"
@@ -233,7 +260,7 @@ const Register = () => {
         <Toaster richColors position="bottom-right" />
       </main>
     </GoogleOAuthProvider>
-  );
-};
+  )
+}
 
-export default Register;
+export default Register
