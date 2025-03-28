@@ -43,87 +43,90 @@ const Nav = ({ toggleShow }) => {
     else setCurrentBox(null)
   }
   return (
-    <nav className="h-[50px] bg-[#fd6c01] lg:px-10 px-2 flex flex-row items-center justify-between relative">
-      {/* Left */}
-      <div className="flex flex-row items-center lg:gap-3 gap-1">
-        <img
-          src={'/public/mascota-clean.png'}
-          className="w-[45px]"
-          alt="Logo Ferretería BOnilla"
-        />
-
-        <div className="flex flex-row items-center justify-between lg:w-[350px] w-[210px] bg-white rounded-full overflow-hidden">
-          <input
-            type="text"
-            className="bg-white lg:py-2 py-1 pl-5 outline-none text-sm flex-1"
-            placeholder="Buscar ofertas"
+    <nav className="h-[50px] bg-[#fd6c01] flex justify-center lg:px-0 px-10">
+      {/* General */}
+      <div className="lg:w-[1400px] w-full mx-auto flex flex-row items-center justify-between relative">
+        {/* Left */}
+        <div className="flex flex-row items-center lg:gap-3 gap-1">
+          <img
+            src={'/public/mascota-clean.png'}
+            className="w-[45px]"
+            alt="Logo Ferretería BOnilla"
           />
-          <div className="w-[50px] h-full flex justify-center items-center">
-            <FaSearch color="#d1d1d1" size={14} />
+
+          <div className="flex flex-row items-center justify-between lg:w-[350px] w-[210px] bg-white rounded-lg overflow-hidden">
+            <input
+              type="text"
+              className="bg-white lg:py-2 py-1 pl-5 outline-none text-sm flex-1"
+              placeholder="Buscar ofertas"
+            />
+            <div className="w-[50px] h-full flex justify-center items-center">
+              <FaSearch color="#d1d1d1" size={18} />
+            </div>
           </div>
         </div>
+
+        {/* Right */}
+
+        <div className="lg:flex-row lg:items-center gap-2 hidden lg:flex relative">
+          <NavLink
+            to={'/offers'}
+            className="w-[40px] h-[40px] rounded-full bg-[#cb4d03] border border-gray-300 cursor-pointer flex justify-center items-center text-white hover:bg-[#ff850b] transition-all duration-300"
+            type="button"
+          >
+            <FaBriefcase size={18} />
+          </NavLink>
+          <button
+            className={`w-[40px] h-[40px] rounded-full ${
+              currentBox === 'msg' ? 'bg-[#ff850b]' : 'bg-[#cb4d03]'
+            }  border border-gray-300 cursor-pointer flex justify-center items-center text-white hover:bg-[#ff850b] transition-all duration-300`}
+            type="button"
+            onClick={toggleShowInbox}
+          >
+            <BiSolidMessageRoundedDots size={18} />
+          </button>
+          <button
+            className={`w-[40px] h-[40px] rounded-full ${
+              currentBox === 'noti' ? 'bg-[#ff850b]' : 'bg-[#cb4d03]'
+            }  border border-gray-300 cursor-pointer flex justify-center items-center text-white hover:bg-[#ff850b] transition-all duration-300`}
+            type="button"
+            onClick={toggleShowNotifications}
+          >
+            <IoIosNotifications size={18} />
+          </button>
+
+          <button
+            className="w-[40px] h-[40px] rounded-full bg-[#cb4d03] cursor-pointer flex justify-center items-center text-white relative hover:opacity-90 transition-colors duration-200"
+            type="button"
+            onClick={toggleShowSettings}
+          >
+            <img
+              src="/public/user.png"
+              alt="Foto de perfil"
+              className="absolute w-full h-full object-cover"
+            />
+
+            <div className="absolute w-[15px] h-[15px] rounded-full flex justify-center items-center right-0 -bottom-1 bg-[#cb4d03]">
+              <BiChevronDown />
+            </div>
+          </button>
+
+          {/* Box Messages */}
+          <Inbox showInbox={showInbox} />
+          {/* Box Notifications */}
+          <Notifications showNotifications={showNotifications} />
+
+          {/* Box Settingss */}
+          <Settings showSettings={showSettings} />
+        </div>
+
+        <button
+          className="lg:hidden w-[35px] flex justify-center items-center text-white hover:text-gray-200 transition-colors duration-300"
+          onClick={toggleShow}
+        >
+          <GiHamburgerMenu size={25} />
+        </button>
       </div>
-
-      {/* Right */}
-
-      <div className="lg:flex-row lg:items-center gap-2 hidden lg:flex relative">
-        <NavLink
-          to={'/offers'}
-          className="w-[40px] h-[40px] rounded-full bg-[#cb4d03] border border-gray-300 cursor-pointer flex justify-center items-center text-white hover:bg-[#ff850b] transition-all duration-300"
-          type="button"
-        >
-          <FaBriefcase size={18} />
-        </NavLink>
-        <button
-          className={`w-[40px] h-[40px] rounded-full ${
-            currentBox === 'msg' ? 'bg-[#ff850b]' : 'bg-[#cb4d03]'
-          }  border border-gray-300 cursor-pointer flex justify-center items-center text-white hover:bg-[#ff850b] transition-all duration-300`}
-          type="button"
-          onClick={toggleShowInbox}
-        >
-          <BiSolidMessageRoundedDots size={18} />
-        </button>
-        <button
-          className={`w-[40px] h-[40px] rounded-full ${
-            currentBox === 'noti' ? 'bg-[#ff850b]' : 'bg-[#cb4d03]'
-          }  border border-gray-300 cursor-pointer flex justify-center items-center text-white hover:bg-[#ff850b] transition-all duration-300`}
-          type="button"
-          onClick={toggleShowNotifications}
-        >
-          <IoIosNotifications size={18} />
-        </button>
-
-        <button
-          className="w-[40px] h-[40px] rounded-full bg-[#cb4d03] cursor-pointer flex justify-center items-center text-white relative hover:opacity-90 transition-colors duration-200"
-          type="button"
-          onClick={toggleShowSettings}
-        >
-          <img
-            src="/public/user.png"
-            alt="Foto de perfil"
-            className="absolute w-full h-full object-cover"
-          />
-
-          <div className="absolute w-[15px] h-[15px] rounded-full flex justify-center items-center right-0 -bottom-1 bg-[#cb4d03]">
-            <BiChevronDown />
-          </div>
-        </button>
-
-        {/* Box Messages */}
-        <Inbox showInbox={showInbox} />
-        {/* Box Notifications */}
-        <Notifications showNotifications={showNotifications} />
-
-        {/* Box Settingss */}
-        <Settings showSettings={showSettings} />
-      </div>
-
-      <button
-        className="lg:hidden w-[35px] flex justify-center items-center text-white hover:text-gray-200 transition-colors duration-300"
-        onClick={toggleShow}
-      >
-        <GiHamburgerMenu size={25} />
-      </button>
     </nav>
   )
 }

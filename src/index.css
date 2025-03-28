@@ -1,6 +1,6 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 html {
-  background-color: #fff;
-  font-family: "Roboto Variable", system-ui, sans-serif;
+  background-color: #f4f2ee;
+  font-family: 'Roboto Variable', system-ui, sans-serif;
 }

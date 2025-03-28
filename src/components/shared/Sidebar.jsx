@@ -17,6 +17,7 @@ const Sidebar = ({ show, toggleShow }) => {
 
   useEffect(() => {
     const data = storageUtil.getData('user-session')
+    if (!data) return
     const { 'user-info': dataUser } = data
     setUser(dataUser)
   }, [])
